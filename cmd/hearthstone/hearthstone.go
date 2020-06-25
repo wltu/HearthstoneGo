@@ -1,4 +1,4 @@
-package discordpp
+package hearthstone
 
 import (
 	"fmt"
