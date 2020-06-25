@@ -89,11 +89,4 @@ func (client *HeartstoneAPI) Execute(request interface{}) {
 			fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Name, v.Field(i).Interface())
 		}
 	}
-	// https://us.api.blizzard.com/hearthstone/cards/52119-arch-villain-rafaam?locale=en_US&access_token=USfS77fnfVxc1N4EEiPCPhedkGdzQy7fKi
-	// v := reflect.ValueOf(s)
-	// typeOfS := v.Type()
-
-	// for i := 0; i < v.NumField(); i++ {
-	// 	fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Name, v.Field(i).Interface())
-	// }
 }

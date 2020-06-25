@@ -9,10 +9,6 @@ import (
 	"github.com/wltu/HearthstoneGo/cmd/hearthstone"
 )
 
-// curl -u 2f6c48af4ad74926a7fcd8eac98bf16e:rnJh1STqD5jhxC4KRYUfs8Ba1G1g6ObT -d grant_type=client_credentials https://us.battle.net/oauth/token
-// USmp8Z5ffUk3AWseyJO1Zvx2IpIjQYQUTk
-// {"access_token":"USmp8Z5ffUk3AWseyJO1Zvx2IpIjQYQUTk","token_type":"bearer","expires_in":86399}
-
 func basicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
