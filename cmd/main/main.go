@@ -27,6 +27,10 @@ func main() {
 		return
 	}
 
-	client := api.New(os.Args[1], os.Args[2], os.Args[3])
+	client := api.NewAPI(os.Args[1], os.Args[2], os.Args[3])
 	fmt.Println(client.ClientToken)
+
+	cardSearch := client.NewCardSearch("52119-arch-villain-rafaam")
+	cardSearch.SetLocale("en_US")
+	client.Execute(cardSearch)
 }

@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"net"
 	"net/http"
+	"reflect"
 	"time"
 )
 
@@ -18,15 +20,15 @@ type HeartstoneAPI struct {
 	heartstoneClient *http.Client
 }
 
-// AuthorizationJSON is the json structure returned after OAuth
-type AuthorizationJSON struct {
+// Authorization is the json structure returned after OAuth
+type Authorization struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-// New acts as a constructor to initialize the HearstoneAPI
-func New(region, clientID, clientSecret string) HeartstoneAPI {
+// NewAPI acts as a constructor to initialize the HearstoneAPI
+func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
 	regionMap := map[string]string{
 		"us": "https://us.api.blizzard.com/",
 		"eu": "https://eu.api.blizzard.com/",
@@ -58,11 +60,40 @@ func New(region, clientID, clientSecret string) HeartstoneAPI {
 }
 
 func (client *HeartstoneAPI) connect() {
-	authorization := AuthorizationJSON{}
+	authorization := Authorization{}
 	err := client.Authorization(client.oauthURL, &authorization)
 	if err != nil {
 		panic(err)
 	}
 
 	client.ClientToken = authorization.AccessToken
+}
+
+// Execute request Heartstone Informations
+func (client *HeartstoneAPI) Execute(request interface{}) {
+
+	if endpoint, ok := request.(CardSearch); ok { // type assert on it
+		url := endpoint.Execute()
+		url += "access_token=" + client.ClientToken
+		card := Card{}
+
+		fmt.Println(url)
+		err := client.Get(url, &card)
+		if err != nil {
+			panic(err)
+		}
+		v := reflect.ValueOf(card)
+		typeOfS := v.Type()
+
+		for i := 0; i < v.NumField(); i++ {
+			fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Name, v.Field(i).Interface())
+		}
+	}
+	// https://us.api.blizzard.com/hearthstone/cards/52119-arch-villain-rafaam?locale=en_US&access_token=USfS77fnfVxc1N4EEiPCPhedkGdzQy7fKi
+	// v := reflect.ValueOf(s)
+	// typeOfS := v.Type()
+
+	// for i := 0; i < v.NumField(); i++ {
+	// 	fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Name, v.Field(i).Interface())
+	// }
 }
