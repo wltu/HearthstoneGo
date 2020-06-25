@@ -2,6 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -57,4 +60,13 @@ func (client *HeartstoneAPI) Get(url string, target interface{}) error {
 	}
 
 	return json.NewDecoder(res.Body).Decode(target)
+}
+
+func readBody(res http.Response) {
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
 }

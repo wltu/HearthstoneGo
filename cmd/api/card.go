@@ -25,6 +25,29 @@ type Card struct {
 	KeywordIds    []int  `json:"keywordIds"`
 }
 
+// CardAll provide information of a Hearstone card in all different regions
+type CardAll struct {
+	ID            int               `json:"id"`
+	Collectible   int               `json:"collectible"`
+	Slug          string            `json:"slug"`
+	ClassID       int               `json:"classId"`
+	MultiClassIds []int             `json:"multiClassIds"`
+	CardTypeID    int               `json:"cardTypeId"`
+	CardSetID     int               `json:"cardSetId"`
+	RarityID      int               `json:"rarityId"`
+	ArtistName    string            `json:"artistName"`
+	Health        int               `json:"health"`
+	Attack        int               `json:"attack"`
+	ManaCost      int               `json:"manaCost"`
+	Name          map[string]string `json:"name"`
+	Text          map[string]string `json:"text"`
+	Image         map[string]string `json:"image"`
+	ImageGold     map[string]string `json:"imageGold"`
+	FlavorText    map[string]string `json:"flavorText"`
+	CropImage     string            `json:"cropImage"`
+	KeywordIds    []int             `json:"keywordIds"`
+}
+
 // CardSearch provides parameters for a search
 type CardSearch struct {
 	url string
@@ -58,14 +81,18 @@ func (cardSearch *CardSearch) SetGameMode(gameMode string) {
 }
 
 // Execute construct api url for CardSearch
-func (cardSearch *CardSearch) Execute() string {
-	// card := Card{}
+func (cardSearch *CardSearch) Execute() (string, interface{}) {
 	url := cardSearch.url + "hearthstone/cards/" + cardSearch.id + "?"
 
 	for key, element := range cardSearch.optional {
 		fmt.Println("Key:", key, "=>", "Element:", element)
 		url += key + "=" + element + "&"
 	}
+	_, ok := cardSearch.optional["locale"]
 
-	return url
+	if ok {
+		return url, Card{}
+	}
+
+	return url, CardAll{}
 }
