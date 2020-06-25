@@ -22,11 +22,11 @@ func main() {
 	fmt.Println("Hello World!")
 	hearthstone.Hello()
 
-	if len(os.Args) < 3 {
+	if len(os.Args) < 4 {
 		fmt.Println("Not enough arguments! Please include client id and secret.")
 		return
 	}
 
-	client := api.New(os.Args[1], os.Args[2])
+	client := api.New(os.Args[1], os.Args[2], os.Args[3])
 	fmt.Println(client.ClientToken)
 }

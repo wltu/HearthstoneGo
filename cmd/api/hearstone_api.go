@@ -12,8 +12,8 @@ type HeartstoneAPI struct {
 	ClientID, ClientSecret string
 	ClientToken            string
 
-	// Defaulr Hearstone API URL
-	hearstoneURL string
+	oauthURL string // Hearstone OAuth URL
+	apiURL   string // Regional Hearstone API URL
 
 	heartstoneClient *http.Client
 }
@@ -26,10 +26,19 @@ type AuthorizationJSON struct {
 }
 
 // New acts as a constructor to initialize the HearstoneAPI
-func New(clientID, clientSecret string) HeartstoneAPI {
+func New(region, clientID, clientSecret string) HeartstoneAPI {
+	regionMap := map[string]string{
+		"us": "https://us.api.blizzard.com/",
+		"eu": "https://eu.api.blizzard.com/",
+		"kr": "https://kr.api.blizzard.com/",
+		"tw": "https://tw.api.blizzard.com/",
+		"ch": "https://gateway.battlenet.com.cn/",
+	}
+
 	client := HeartstoneAPI{ClientID: clientID,
 		ClientSecret: clientSecret,
-		hearstoneURL: "https://us.battle.net/"}
+		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
+		apiURL:       regionMap[region]}
 
 	netTransport := &http.Transport{
 		Dial: (&net.Dialer{
@@ -49,10 +58,8 @@ func New(clientID, clientSecret string) HeartstoneAPI {
 }
 
 func (client *HeartstoneAPI) connect() {
-	url := client.hearstoneURL + "oauth/token?grant_type=client_credentials"
 	authorization := AuthorizationJSON{}
-	err := client.Authorization(url, &authorization)
-
+	err := client.Authorization(client.oauthURL, &authorization)
 	if err != nil {
 		panic(err)
 	}
