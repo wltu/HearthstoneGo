@@ -38,7 +38,7 @@ type cardSearch struct {
 }
 
 // NewCardSearch acts as a constructor for cardSearch
-func (client *HeartstoneAPI) newCardSearch(id, locale string) cardSearch {
+func (client *HearthstoneAPI) newCardSearch(id, locale string) cardSearch {
 	// Required parameters
 	return cardSearch{
 		url:      client.apiURL,
@@ -102,7 +102,7 @@ type CardCollectionSearch struct {
 }
 
 // NewCardCollectionSearch acts as a constructor for CardsSearch
-func (client *HeartstoneAPI) NewCardCollectionSearch() CardCollectionSearch {
+func (client *HearthstoneAPI) NewCardCollectionSearch() CardCollectionSearch {
 	return CardCollectionSearch{}
 }
 

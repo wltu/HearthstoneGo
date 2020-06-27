@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (client *HeartstoneAPI) authorization(url string, authorization *Authorization) error {
+func (client *HearthstoneAPI) authorization(url string, authorization *Authorization) error {
 	request, err := http.NewRequest("POST", url, nil)
 	request.SetBasicAuth(client.ClientID, client.ClientSecret)
 

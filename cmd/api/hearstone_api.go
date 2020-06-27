@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-// HeartstoneAPI connects to Blizzard API for Hearstone Informations
-type HeartstoneAPI struct {
+// HearthstoneAPI connects to Blizzard API for Hearstone Informations
+type HearthstoneAPI struct {
 	// Client Log in information
 	ClientID, ClientSecret string
 	ClientToken            string
@@ -32,7 +32,7 @@ type endpoint interface {
 }
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
-func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
+func NewAPI(region, clientID, clientSecret string) HearthstoneAPI {
 	regionMap := map[string]string{
 		"us": "https://us.api.blizzard.com/",
 		"eu": "https://eu.api.blizzard.com/",
@@ -41,7 +41,7 @@ func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
 		"ch": "https://gateway.battlenet.com.cn/",
 	}
 
-	client := HeartstoneAPI{ClientID: clientID,
+	client := HearthstoneAPI{ClientID: clientID,
 		ClientSecret: clientSecret,
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
 		apiURL:       regionMap[region]}
@@ -63,7 +63,7 @@ func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
 	return client
 }
 
-func (client *HeartstoneAPI) connect() {
+func (client *HearthstoneAPI) connect() {
 	auth := Authorization{}
 	err := client.authorization(client.oauthURL, &auth)
 	if err != nil {
@@ -74,7 +74,7 @@ func (client *HeartstoneAPI) connect() {
 }
 
 // SearchCard make a API call to search for a card with the given id
-func (client *HeartstoneAPI) SearchCard(id string) Card {
+func (client *HearthstoneAPI) SearchCard(id string) Card {
 	cardSearch := client.newCardSearch(id, "en_US")
 
 	if output, ok := client.execute(&cardSearch).(Card); ok {
@@ -104,7 +104,7 @@ func print(body interface{}) {
 	}
 }
 
-func (client *HeartstoneAPI) execute(request endpoint) interface{} {
+func (client *HearthstoneAPI) execute(request endpoint) interface{} {
 	return request.execute(
 		client.heartstoneClient,
 		client.ClientToken,
