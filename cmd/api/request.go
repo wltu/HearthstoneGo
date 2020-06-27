@@ -8,8 +8,7 @@ import (
 	"net/http"
 )
 
-// Authorization request to Hearstone API
-func (client *HeartstoneAPI) Authorization(url string, target interface{}) error {
+func (client *HeartstoneAPI) authorization(url string, authorization *Authorization) error {
 	request, err := http.NewRequest("POST", url, nil)
 	request.SetBasicAuth(client.ClientID, client.ClientSecret)
 
@@ -25,18 +24,17 @@ func (client *HeartstoneAPI) Authorization(url string, target interface{}) error
 
 	defer res.Body.Close()
 
-	return json.NewDecoder(res.Body).Decode(target)
+	return json.NewDecoder(res.Body).Decode(authorization)
 }
 
-// Post request to Hearstone API
-func (client *HeartstoneAPI) Post(url string, target interface{}) error {
+func post(client *http.Client, url string, target interface{}) error {
 	request, err := http.NewRequest("POST", url, nil)
 
 	if err != nil {
 		return err
 	}
 
-	res, err := client.heartstoneClient.Do(request)
+	res, err := client.Do(request)
 
 	if err != nil {
 		return err
@@ -45,15 +43,14 @@ func (client *HeartstoneAPI) Post(url string, target interface{}) error {
 	return json.NewDecoder(res.Body).Decode(target)
 }
 
-// Get request to Hearstone API
-func (client *HeartstoneAPI) Get(url string, target interface{}) error {
+func get(client *http.Client, url string, target interface{}) error {
 	request, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
 		panic(err)
 	}
 
-	res, err := client.heartstoneClient.Do(request)
+	res, err := client.Do(request)
 
 	if err != nil {
 		panic(err)

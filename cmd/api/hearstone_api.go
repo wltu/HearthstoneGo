@@ -27,6 +27,10 @@ type Authorization struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+type endpoint interface {
+	execute(client *http.Client, url string) interface{}
+}
+
 // NewAPI acts as a constructor to initialize the HearstoneAPI
 func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
 	regionMap := map[string]string{
@@ -60,16 +64,27 @@ func NewAPI(region, clientID, clientSecret string) HeartstoneAPI {
 }
 
 func (client *HeartstoneAPI) connect() {
-	authorization := Authorization{}
-	err := client.Authorization(client.oauthURL, &authorization)
+	auth := Authorization{}
+	err := client.authorization(client.oauthURL, &auth)
 	if err != nil {
 		panic(err)
 	}
 
-	client.ClientToken = authorization.AccessToken
+	client.ClientToken = auth.AccessToken
 }
 
-func (client *HeartstoneAPI) print(body interface{}) {
+// SearchCard make a API call to search for a card with the given id
+func (client *HeartstoneAPI) SearchCard(id string) Card {
+	cardSearch := client.newCardSearch(id, "en_US")
+
+	if output, ok := client.execute(&cardSearch).(Card); ok {
+		return output
+	}
+
+	return Card{}
+}
+
+func print(body interface{}) {
 	var value reflect.Value
 
 	switch v := body.(type) {
@@ -77,13 +92,9 @@ func (client *HeartstoneAPI) print(body interface{}) {
 		if card, ok := body.(Card); ok {
 			value = reflect.ValueOf(card)
 		}
-
-	case CardAll:
-		if card, ok := body.(CardAll); ok {
-			value = reflect.ValueOf(card)
-		}
 	default:
 		fmt.Printf("I don't know about type %T!\n", v)
+		return
 	}
 
 	typeOfS := value.Type()
@@ -93,40 +104,9 @@ func (client *HeartstoneAPI) print(body interface{}) {
 	}
 }
 
-func (client *HeartstoneAPI) searchCards(url string, card interface{}) interface{} {
-
-	if cardType, ok := card.(Card); ok {
-		fmt.Println(url)
-		err := client.Get(url, &cardType)
-		if err != nil {
-			panic(err)
-		}
-
-		client.print(cardType)
-		return cardType
-	}
-
-	if cardType, ok := card.(CardAll); ok {
-		fmt.Println(url)
-		err := client.Get(url, &cardType)
-		if err != nil {
-			panic(err)
-		}
-
-		client.print(cardType)
-
-		return cardType
-	}
-
-	return nil
-}
-
-// Execute request Heartstone Informations
-func (client *HeartstoneAPI) Execute(request interface{}) {
-
-	if endpoint, ok := request.(CardSearch); ok { // type assert on it
-		url, card := endpoint.Execute()
-		url += "access_token=" + client.ClientToken
-		client.searchCards(url, card)
-	}
+func (client *HeartstoneAPI) execute(request endpoint) interface{} {
+	return request.execute(
+		client.heartstoneClient,
+		client.ClientToken,
+	)
 }

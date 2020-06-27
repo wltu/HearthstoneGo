@@ -1,18 +1,12 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
 	"os"
 
 	"github.com/wltu/HearthstoneGo/cmd/api"
 	"github.com/wltu/HearthstoneGo/cmd/hearthstone"
 )
-
-func basicAuth(username, password string) string {
-	auth := username + ":" + password
-	return base64.StdEncoding.EncodeToString([]byte(auth))
-}
 
 func main() {
 	fmt.Println("Hello World!")
@@ -26,7 +20,5 @@ func main() {
 	client := api.NewAPI(os.Args[1], os.Args[2], os.Args[3])
 	fmt.Println(client.ClientToken)
 
-	cardSearch := client.NewCardSearch("52119-arch-villain-rafaam")
-	cardSearch.SetLocale("en_US")
-	client.Execute(cardSearch)
+	client.SearchCard("52119-arch-villain-rafaam")
 }

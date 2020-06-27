@@ -7,3 +7,6 @@ Unofficial library of accessing Hearthstone game data in Go
 
 ### Project Structure
 This project follows loosely the proejct structure [here](https://github.com/golang-standards/project-layout).
+
+### Design Document
+The rough design document for the project can be found [here](https://docs.google.com/document/d/1hwWPqrOF7vG7u6qqmdCPqRR4Js99LyKEcchpjR17Z3E/edit?usp=sharing).

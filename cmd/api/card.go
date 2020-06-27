@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 // Card provide information of a Hearstone card
 type Card struct {
@@ -25,74 +28,120 @@ type Card struct {
 	KeywordIds    []int  `json:"keywordIds"`
 }
 
-// CardAll provide information of a Hearstone card in all different regions
-type CardAll struct {
-	ID            int               `json:"id"`
-	Collectible   int               `json:"collectible"`
-	Slug          string            `json:"slug"`
-	ClassID       int               `json:"classId"`
-	MultiClassIds []int             `json:"multiClassIds"`
-	CardTypeID    int               `json:"cardTypeId"`
-	CardSetID     int               `json:"cardSetId"`
-	RarityID      int               `json:"rarityId"`
-	ArtistName    string            `json:"artistName"`
-	Health        int               `json:"health"`
-	Attack        int               `json:"attack"`
-	ManaCost      int               `json:"manaCost"`
-	Name          map[string]string `json:"name"`
-	Text          map[string]string `json:"text"`
-	Image         map[string]string `json:"image"`
-	ImageGold     map[string]string `json:"imageGold"`
-	FlavorText    map[string]string `json:"flavorText"`
-	CropImage     string            `json:"cropImage"`
-	KeywordIds    []int             `json:"keywordIds"`
-}
-
-// CardSearch provides parameters for a search
-type CardSearch struct {
-	url string
-	id  string
-
+type cardSearch struct {
+	// Required Parameters
+	url    string
+	id     string
+	locale string
 	// Optional Parameters
 	optional map[string]string
 }
 
-// NewCardSearch acts as a constructor for CardSearch
-func (client *HeartstoneAPI) NewCardSearch(id string) CardSearch {
+// NewCardSearch acts as a constructor for cardSearch
+func (client *HeartstoneAPI) newCardSearch(id, locale string) cardSearch {
 	// Required parameters
-	cardSearch := CardSearch{url: client.apiURL, id: id, optional: make(map[string]string)}
-
-	return cardSearch
+	return cardSearch{
+		url:      client.apiURL,
+		id:       id,
+		locale:   locale,
+		optional: make(map[string]string),
+	}
 }
 
-// SetID update the current id value for CardSearch
-func (cardSearch *CardSearch) SetID(id string) {
-	cardSearch.id = id
+// SetID update the current id value for cardSearch
+func (search *cardSearch) SetID(id string) {
+	search.id = id
 }
 
-// SetLocale set the optional parameter of locale for CardSearch
-func (cardSearch *CardSearch) SetLocale(locale string) {
-	cardSearch.optional["locale"] = locale
+// SetLocale set the optional parameter of locale for cardSearch
+func (search *cardSearch) SetLocale(locale string) {
+	search.locale = locale
 }
 
-// SetGameMode set the optional parameter of game mode for CardSearch
-func (cardSearch *CardSearch) SetGameMode(gameMode string) {
-	cardSearch.optional["gameMode"] = gameMode
+// SetGameMode set the optional parameter of game mode for cardSearch
+func (search *cardSearch) SetGameMode(gameMode string) {
+	search.optional["gameMode"] = gameMode
 }
 
-// Execute construct api url for CardSearch
-func (cardSearch *CardSearch) Execute() (string, interface{}) {
-	url := cardSearch.url + "hearthstone/cards/" + cardSearch.id + "?"
+func (search *cardSearch) test() {
 
-	for key, element := range cardSearch.optional {
+}
+
+func (search *cardSearch) execute(client *http.Client, token string) interface{} {
+	url := search.url +
+		"hearthstone/cards/" +
+		search.id + "?locale=" +
+		search.locale + "&" +
+		"access_token=" + token
+
+	for key, element := range search.optional {
 		fmt.Println("Key:", key, "=>", "Element:", element)
 		url += key + "=" + element + "&"
 	}
-	_, ok := cardSearch.optional["locale"]
 
-	if ok {
-		return url, Card{}
+	card := Card{}
+	err := get(client, url, &card)
+
+	if err != nil {
+		panic(err)
 	}
 
-	return url, CardAll{}
+	print(card)
+
+	return card
 }
+
+// CardCollectionSearch provides parameters for a card collection search
+type CardCollectionSearch struct {
+	// Required Parameters
+	locale string
+
+	// Optional Parameters
+	optionalString map[string]string
+	optionalInt    map[string]int
+}
+
+// NewCardCollectionSearch acts as a constructor for CardsSearch
+func (client *HeartstoneAPI) NewCardCollectionSearch() CardCollectionSearch {
+	return CardCollectionSearch{}
+}
+
+// // SetLocale set the optional parameter of locale for CardsSearch
+// func (cardsSearch *CardsSearch) SetLocale(locale string) {
+// 	cardSearch.optionalString["locale"] = locale
+// }
+
+// // SetGameMode set the optional parameter of game mode for CardsSearch
+// func (cardsSearch *CardsSearch) SetGameMode(gameMode string) {
+// 	cardSearch.optionalString["gameMode"] = gameMode
+// }
+
+// // SetCardSet set the optional parameter of card set for CardsSearch
+// func (cardsSearch *CardsSearch) SetCardSet(set string) {
+// 	cardSearch.optionalString["set"] = set
+// }
+
+// // SetClass set the optional parameter of hero class for CardsSearch
+// func (cardsSearch *CardsSearch) SetClass(class string) {
+// 	cardSearch.optionalString["class"] = class
+// }
+
+// // SetManaCost set the optional parameter of card mana cost for CardsSearch
+// func (cardsSearch *CardsSearch) SetManaCost(manaCost int) {
+// 	cardSearch.optionalInt["manaCost"] = manaCost
+// }
+
+// // SetAttack set the optional parameter of minion attack for CardsSearch
+// func (cardsSearch *CardsSearch) SetAttack(attack int) {
+// 	cardSearch.optionalInt["SetAttack"] = SetAttack
+// }
+
+// // SetHealth set the optional parameter of minion health for CardsSearch
+// func (cardsSearch *CardsSearch) SetHealth(health int) {
+// 	cardSearch.optionalInt["health"] = health
+// }
+
+// // SetCollectible set the optional parameter of collectible for CardsSearch
+// func (cardsSearch *CardsSearch) SetCollectible(collectible bool) {
+// 	cardSearch.optionalInt["collectible"] = collectible
+// }
