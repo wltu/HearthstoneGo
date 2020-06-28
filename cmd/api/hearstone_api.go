@@ -96,6 +96,17 @@ func (client *HearthstoneAPI) connect() {
 	client.ClientToken = auth.AccessToken
 }
 
+// SearchDeck make a API call to search for a deck with the given id
+func (client *HearthstoneAPI) SearchDeck(id string) Deck {
+	search := client.newDeckSearch(id)
+
+	if output, ok := client.execute(&search).(Deck); ok {
+		return output
+	}
+
+	return Deck{}
+}
+
 // SearchCard make a API call to search for a card with the given id
 func (client *HearthstoneAPI) SearchCard(id string) Card {
 	search := client.newCardSearch(id)
@@ -158,6 +169,10 @@ func print(body interface{}) {
 		}
 	case CardBackCollection:
 		if data, ok := body.(CardBackCollection); ok {
+			value = reflect.ValueOf(data)
+		}
+	case Deck:
+		if data, ok := body.(Deck); ok {
 			value = reflect.ValueOf(data)
 		}
 	case Metadata:

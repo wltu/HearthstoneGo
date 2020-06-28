@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -65,6 +66,11 @@ type Class struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
 	CardID int    `json:"cardId"`
+}
+
+// String function for Hero Class
+func (class Class) String() string {
+	return fmt.Sprintf(class.Name)
 }
 
 // MinionType provides the different types of minions in Hearthstone

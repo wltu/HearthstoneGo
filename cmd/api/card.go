@@ -51,7 +51,9 @@ func (client *HearthstoneAPI) newCardSearch(id string) cardSearch {
 
 // String function for Card
 func (card Card) String() string {
-	return fmt.Sprintf("%s: %d/%d", card.Name, card.Attack, card.Health)
+	return fmt.Sprintf("%s: %d mana %d/%d",
+		card.Name, card.ManaCost,
+		card.Attack, card.Health)
 }
 
 // SetID update the current id value for cardSearch

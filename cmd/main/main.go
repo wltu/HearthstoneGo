@@ -25,7 +25,8 @@ func main() {
 		// client.SearchCard("56363")
 		// cardCollrection := client.SearchCardCollection()
 		// client.SearchCardBack("155-pizza-stone")
-		client.SearchCardBackCollection()
+		// client.SearchCardBackCollection()
+		client.SearchDeck("AAECAQcG+wyd8AKS+AKggAOblAPanQMMS6IE/web8wLR9QKD+wKe+wKz/AL1gAOXlAOalAOSnwMA")
 
 		// fmt.Println(cardCollrection.Cards[0])
 	} else {
