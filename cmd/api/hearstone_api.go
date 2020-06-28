@@ -84,12 +84,27 @@ func (client *HearthstoneAPI) SearchCard(id string) Card {
 	return Card{}
 }
 
+// SearchCardCollection make a API call to search for a set of cards
+func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
+	cardSearch := client.newCardCollectionSearch("en_US")
+
+	if output, ok := client.execute(&cardSearch).(CardCollection); ok {
+		return output
+	}
+
+	return CardCollection{}
+}
+
 func print(body interface{}) {
 	var value reflect.Value
 
 	switch v := body.(type) {
 	case Card:
 		if card, ok := body.(Card); ok {
+			value = reflect.ValueOf(card)
+		}
+	case CardCollection:
+		if card, ok := body.(CardCollection); ok {
 			value = reflect.ValueOf(card)
 		}
 	default:

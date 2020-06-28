@@ -21,4 +21,5 @@ func main() {
 	fmt.Println(client.ClientToken)
 
 	client.SearchCard("52119-arch-villain-rafaam")
+	client.SearchCardCollection()
 }

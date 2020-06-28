@@ -5,13 +5,14 @@ import (
 	"net/http"
 )
 
-// Card provide information of a Hearstone card
+// Card provide information of a Hearthstone card
 type Card struct {
 	ID            int    `json:"id"`
 	Collectible   int    `json:"collectible"`
 	Slug          string `json:"slug"`
 	ClassID       int    `json:"classId"`
 	MultiClassIds []int  `json:"multiClassIds"`
+	MinionTypeID  int    `json:"minionTypeId"`
 	CardTypeID    int    `json:"cardTypeId"`
 	CardSetID     int    `json:"cardSetId"`
 	RarityID      int    `json:"rarityId"`
@@ -25,6 +26,7 @@ type Card struct {
 	ImageGold     string `json:"imageGold"`
 	FlavorText    string `json:"flavorText"`
 	CropImage     string `json:"cropImage"`
+	ChildIds      []int  `json:"childIds"`
 	KeywordIds    []int  `json:"keywordIds"`
 }
 
@@ -63,10 +65,6 @@ func (search *cardSearch) SetGameMode(gameMode string) {
 	search.optional["gameMode"] = gameMode
 }
 
-func (search *cardSearch) test() {
-
-}
-
 func (search *cardSearch) execute(client *http.Client, token string) interface{} {
 	url := search.url +
 		"hearthstone/cards/" +
@@ -91,9 +89,18 @@ func (search *cardSearch) execute(client *http.Client, token string) interface{}
 	return card
 }
 
-// CardCollectionSearch provides parameters for a card collection search
-type CardCollectionSearch struct {
+// CardCollection provide information of a Hearthstone Card Collection
+type CardCollection struct {
+	Cards     []Card `json:"cards"`
+	CardCount int    `json:"cardCount"`
+	PageCount int    `json:"pageCount"`
+	Page      int    `json:"page"`
+}
+
+// cardCollectionSearch provides parameters for a card collection search
+type cardCollectionSearch struct {
 	// Required Parameters
+	url    string
 	locale string
 
 	// Optional Parameters
@@ -102,46 +109,72 @@ type CardCollectionSearch struct {
 }
 
 // NewCardCollectionSearch acts as a constructor for CardsSearch
-func (client *HearthstoneAPI) NewCardCollectionSearch() CardCollectionSearch {
-	return CardCollectionSearch{}
+func (client *HearthstoneAPI) newCardCollectionSearch(locale string) cardCollectionSearch {
+	return cardCollectionSearch{
+		url:    client.apiURL,
+		locale: locale,
+	}
 }
 
-// // SetLocale set the optional parameter of locale for CardsSearch
-// func (cardsSearch *CardsSearch) SetLocale(locale string) {
-// 	cardSearch.optionalString["locale"] = locale
-// }
+// SetGameMode set the optional parameter of game mode for CardsSearch
+func (search *cardCollectionSearch) SetGameMode(gameMode string) {
+	search.optionalString["gameMode"] = gameMode
+}
 
-// // SetGameMode set the optional parameter of game mode for CardsSearch
-// func (cardsSearch *CardsSearch) SetGameMode(gameMode string) {
-// 	cardSearch.optionalString["gameMode"] = gameMode
-// }
+// SetCardSet set the optional parameter of card set for CardsSearch
+func (search *cardCollectionSearch) SetCardSet(set string) {
+	search.optionalString["set"] = set
+}
 
-// // SetCardSet set the optional parameter of card set for CardsSearch
-// func (cardsSearch *CardsSearch) SetCardSet(set string) {
-// 	cardSearch.optionalString["set"] = set
-// }
+// SetClass set the optional parameter of hero class for CardsSearch
+func (search *cardCollectionSearch) SetClass(class string) {
+	search.optionalString["class"] = class
+}
 
-// // SetClass set the optional parameter of hero class for CardsSearch
-// func (cardsSearch *CardsSearch) SetClass(class string) {
-// 	cardSearch.optionalString["class"] = class
-// }
+// SetManaCost set the optional parameter of card mana cost for CardsSearch
+func (search *cardCollectionSearch) SetManaCost(manaCost int) {
+	search.optionalInt["manaCost"] = manaCost
+}
 
-// // SetManaCost set the optional parameter of card mana cost for CardsSearch
-// func (cardsSearch *CardsSearch) SetManaCost(manaCost int) {
-// 	cardSearch.optionalInt["manaCost"] = manaCost
-// }
+// SetAttack set the optional parameter of minion attack for CardsSearch
+func (search *cardCollectionSearch) SetAttack(attack int) {
+	search.optionalInt["SetAttack"] = attack
+}
 
-// // SetAttack set the optional parameter of minion attack for CardsSearch
-// func (cardsSearch *CardsSearch) SetAttack(attack int) {
-// 	cardSearch.optionalInt["SetAttack"] = SetAttack
-// }
+// SetHealth set the optional parameter of minion health for CardsSearch
+func (search *cardCollectionSearch) SetHealth(health int) {
+	search.optionalInt["health"] = health
+}
 
-// // SetHealth set the optional parameter of minion health for CardsSearch
-// func (cardsSearch *CardsSearch) SetHealth(health int) {
-// 	cardSearch.optionalInt["health"] = health
-// }
+// SetCollectible set the optional parameter of collectible for CardsSearch
+func (search *cardCollectionSearch) SetCollectible(collectible int) {
+	search.optionalInt["collectible"] = collectible
+}
 
-// // SetCollectible set the optional parameter of collectible for CardsSearch
-// func (cardsSearch *CardsSearch) SetCollectible(collectible bool) {
-// 	cardSearch.optionalInt["collectible"] = collectible
-// }
+func (search *cardCollectionSearch) execute(client *http.Client, token string) interface{} {
+	url := search.url +
+		"hearthstone/cards/?locale=" +
+		search.locale + "&" +
+		"access_token=" + token
+
+	for key, element := range search.optionalString {
+		fmt.Println("Key:", key, "=>", "Element:", element)
+		url += key + "=" + element + "&"
+	}
+
+	for key, element := range search.optionalInt {
+		fmt.Println("Key:", key, "=>", "Element:", element)
+		url += key + "=" + string(element) + "&"
+	}
+
+	cardCollection := CardCollection{}
+	err := get(client, url, &cardCollection)
+
+	if err != nil {
+		panic(err)
+	}
+
+	print(cardCollection)
+
+	return cardCollection
+}
