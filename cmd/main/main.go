@@ -24,6 +24,8 @@ func main() {
 		// fmt.Println()
 		// client.SearchCard("56363")
 		// cardCollrection := client.SearchCardCollection()
+		// client.SearchCardBack("155-pizza-stone")
+		client.SearchCardBackCollection()
 
 		// fmt.Println(cardCollrection.Cards[0])
 	} else {

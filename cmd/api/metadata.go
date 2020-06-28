@@ -124,7 +124,7 @@ func (search *metadataSearch) execute(client *http.Client, token string) interfa
 		panic(err)
 	}
 
-	print(metadata)
+	// print(metadata)
 
 	return metadata
 }

@@ -39,7 +39,6 @@ type cardSearch struct {
 	optional map[string]string
 }
 
-// NewCardSearch acts as a constructor for cardSearch
 func (client *HearthstoneAPI) newCardSearch(id string) cardSearch {
 	// Required parameters
 	return cardSearch{
@@ -113,7 +112,7 @@ type cardCollectionSearch struct {
 	optionalInt    map[string]int
 }
 
-// NewCardCollectionSearch acts as a constructor for CardsSearch
+// NewCardCollectionSearch acts as a constructor for CardCollectionSearch
 func (client *HearthstoneAPI) newCardCollectionSearch() cardCollectionSearch {
 	return cardCollectionSearch{
 		url:    client.apiURL,
@@ -121,37 +120,37 @@ func (client *HearthstoneAPI) newCardCollectionSearch() cardCollectionSearch {
 	}
 }
 
-// SetGameMode set the optional parameter of game mode for CardsSearch
+// SetGameMode set the optional parameter of game mode for CardCollectionSearch
 func (search *cardCollectionSearch) SetGameMode(gameMode string) {
 	search.optionalString["gameMode"] = gameMode
 }
 
-// SetCardSet set the optional parameter of card set for CardsSearch
+// SetCardSet set the optional parameter of card set for CardCollectionSearch
 func (search *cardCollectionSearch) SetCardSet(set string) {
 	search.optionalString["set"] = set
 }
 
-// SetClass set the optional parameter of hero class for CardsSearch
+// SetClass set the optional parameter of hero class for CardCollectionSearch
 func (search *cardCollectionSearch) SetClass(class string) {
 	search.optionalString["class"] = class
 }
 
-// SetManaCost set the optional parameter of card mana cost for CardsSearch
+// SetManaCost set the optional parameter of card mana cost for CardCollectionSearch
 func (search *cardCollectionSearch) SetManaCost(manaCost int) {
 	search.optionalInt["manaCost"] = manaCost
 }
 
-// SetAttack set the optional parameter of minion attack for CardsSearch
+// SetAttack set the optional parameter of minion attack for CardCollectionSearch
 func (search *cardCollectionSearch) SetAttack(attack int) {
 	search.optionalInt["SetAttack"] = attack
 }
 
-// SetHealth set the optional parameter of minion health for CardsSearch
+// SetHealth set the optional parameter of minion health for CardCollectionSearch
 func (search *cardCollectionSearch) SetHealth(health int) {
 	search.optionalInt["health"] = health
 }
 
-// SetCollectible set the optional parameter of collectible for CardsSearch
+// SetCollectible set the optional parameter of collectible for CardCollectionSearch
 func (search *cardCollectionSearch) SetCollectible(collectible int) {
 	search.optionalInt["collectible"] = collectible
 }

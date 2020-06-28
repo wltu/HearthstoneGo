@@ -14,9 +14,10 @@ type HearthstoneAPI struct {
 	ClientID, ClientSecret string
 	ClientToken            string
 
-	locale   string
-	oauthURL string // Hearstone OAuth URL
-	apiURL   string // Regional Hearstone API URL
+	localeMap map[string]string
+	locale    string
+	oauthURL  string // Hearstone OAuth URL
+	apiURL    string // Regional Hearstone API URL
 
 	metadata Metadata
 
@@ -36,20 +37,28 @@ type endpoint interface {
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
 func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, bool) {
-	regionMap := map[string]string{
-		"us": "https://us.api.blizzard.com/",
-		"eu": "https://eu.api.blizzard.com/",
-		"kr": "https://kr.api.blizzard.com/",
-		"tw": "https://tw.api.blizzard.com/",
-		"ch": "https://gateway.battlenet.com.cn/",
-	}
 
 	client := HearthstoneAPI{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
-		apiURL:       regionMap[region],
+		apiURL:       "https://" + region + ".api.blizzard.com/",
 		locale:       locale,
+		localeMap: map[string]string{
+			"USA":           "en_US",
+			"Mexico":        "es_MX",
+			"Brazil":        "pt_BR",
+			"Great Britain": "en_GB",
+			"Spain":         "es_ES",
+			"France":        "fr_FR",
+			"Russia":        "ru_RU",
+			"Germany":       "de_DE",
+			"Portugal":      "pt_PT",
+			"Italy":         "it_IT",
+			"Korea":         "ko_KR",
+			"Taiwan":        "zh_TW",
+			"China":         "zh_CH",
+		},
 	}
 
 	netTransport := &http.Transport{
@@ -89,9 +98,9 @@ func (client *HearthstoneAPI) connect() {
 
 // SearchCard make a API call to search for a card with the given id
 func (client *HearthstoneAPI) SearchCard(id string) Card {
-	cardSearch := client.newCardSearch(id)
+	search := client.newCardSearch(id)
 
-	if output, ok := client.execute(&cardSearch).(Card); ok {
+	if output, ok := client.execute(&search).(Card); ok {
 		return output
 	}
 
@@ -100,13 +109,35 @@ func (client *HearthstoneAPI) SearchCard(id string) Card {
 
 // SearchCardCollection make a API call to search for a set of cards
 func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
-	cardSearch := client.newCardCollectionSearch()
+	search := client.newCardCollectionSearch()
 
-	if output, ok := client.execute(&cardSearch).(CardCollection); ok {
+	if output, ok := client.execute(&search).(CardCollection); ok {
 		return output
 	}
 
 	return CardCollection{}
+}
+
+// SearchCardBack make a API call to search for a card back with the given id
+func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
+	search := client.newCardBackSearch(id)
+
+	if output, ok := client.execute(&search).(CardBack); ok {
+		return output
+	}
+
+	return CardBack{}
+}
+
+// SearchCardBackCollection make a API call to search for a collection of card backs
+func (client *HearthstoneAPI) SearchCardBackCollection() CardBackCollection {
+	search := client.newCardBackCollectionSearch()
+
+	if output, ok := client.execute(&search).(CardBackCollection); ok {
+		return output
+	}
+
+	return CardBackCollection{}
 }
 
 func print(body interface{}) {
@@ -119,6 +150,14 @@ func print(body interface{}) {
 		}
 	case CardCollection:
 		if data, ok := body.(CardCollection); ok {
+			value = reflect.ValueOf(data)
+		}
+	case CardBack:
+		if data, ok := body.(CardBack); ok {
+			value = reflect.ValueOf(data)
+		}
+	case CardBackCollection:
+		if data, ok := body.(CardBackCollection); ok {
 			value = reflect.ValueOf(data)
 		}
 	case Metadata:
