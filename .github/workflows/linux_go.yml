@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Build
-      run: go build ./cmd/main/main.go
+      run: go build ./cmd/api
 
     - name: Test
       run: go test ./internal/test
