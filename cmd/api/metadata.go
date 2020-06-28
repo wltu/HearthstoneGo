@@ -103,9 +103,9 @@ type metadataSearch struct {
 }
 
 // newMetadataSearch acts as a constructor for metadataSearch
-func (client *HearthstoneAPI) newMetadataSearch() cardSearch {
+func (client *HearthstoneAPI) newMetadataSearch() metadataSearch {
 	// Required parameters
-	return cardSearch{
+	return metadataSearch{
 		url:    client.apiURL,
 		locale: client.locale,
 	}

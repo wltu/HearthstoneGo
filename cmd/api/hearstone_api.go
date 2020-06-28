@@ -35,7 +35,7 @@ type endpoint interface {
 }
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
-func NewAPI(locale, region, clientID, clientSecret string) HearthstoneAPI {
+func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, bool) {
 	regionMap := map[string]string{
 		"us": "https://us.api.blizzard.com/",
 		"eu": "https://eu.api.blizzard.com/",
@@ -66,13 +66,15 @@ func NewAPI(locale, region, clientID, clientSecret string) HearthstoneAPI {
 
 	client.connect()
 
-	// search := client.newMetadataSearch()
+	search := client.newMetadataSearch()
 
-	// if output, ok := client.execute(&search).(Metadata); ok {
-	// 	client.metadata = output
-	// }
+	if output, ok := client.execute(&search).(Metadata); ok {
+		client.metadata = output
+	} else {
+		return nil, false
+	}
 
-	return client
+	return &client, true
 }
 
 func (client *HearthstoneAPI) connect() {
@@ -112,12 +114,16 @@ func print(body interface{}) {
 
 	switch v := body.(type) {
 	case Card:
-		if card, ok := body.(Card); ok {
-			value = reflect.ValueOf(card)
+		if data, ok := body.(Card); ok {
+			value = reflect.ValueOf(data)
 		}
 	case CardCollection:
-		if card, ok := body.(CardCollection); ok {
-			value = reflect.ValueOf(card)
+		if data, ok := body.(CardCollection); ok {
+			value = reflect.ValueOf(data)
+		}
+	case Metadata:
+		if data, ok := body.(Metadata); ok {
+			value = reflect.ValueOf(data)
 		}
 	default:
 		fmt.Printf("I don't know about type %T!\n", v)
