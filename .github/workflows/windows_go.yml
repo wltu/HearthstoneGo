@@ -27,7 +27,7 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: go build ./cmd/discordpp/discordpp.go
+      run: go build ./cmd/main/main.go
 
     - name: Test
       run: go test ./internal/test
