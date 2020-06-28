@@ -40,14 +40,19 @@ type cardSearch struct {
 }
 
 // NewCardSearch acts as a constructor for cardSearch
-func (client *HearthstoneAPI) newCardSearch(id, locale string) cardSearch {
+func (client *HearthstoneAPI) newCardSearch(id string) cardSearch {
 	// Required parameters
 	return cardSearch{
 		url:      client.apiURL,
 		id:       id,
-		locale:   locale,
+		locale:   client.locale,
 		optional: make(map[string]string),
 	}
+}
+
+// String function for Card
+func (card Card) String() string {
+	return fmt.Sprintf("%s: %d/%d", card.Name, card.Attack, card.Health)
 }
 
 // SetID update the current id value for cardSearch
@@ -109,10 +114,10 @@ type cardCollectionSearch struct {
 }
 
 // NewCardCollectionSearch acts as a constructor for CardsSearch
-func (client *HearthstoneAPI) newCardCollectionSearch(locale string) cardCollectionSearch {
+func (client *HearthstoneAPI) newCardCollectionSearch() cardCollectionSearch {
 	return cardCollectionSearch{
 		url:    client.apiURL,
-		locale: locale,
+		locale: client.locale,
 	}
 }
 

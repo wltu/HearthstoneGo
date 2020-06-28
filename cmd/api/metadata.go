@@ -1,5 +1,9 @@
 package api
 
+import (
+	"net/http"
+)
+
 // Metadata provides information to categorize the cards
 type Metadata struct {
 	Sets               []Set              `json:"sets"`
@@ -91,4 +95,36 @@ type CardBackCategory struct {
 	Slug string `json:"slug"`
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type metadataSearch struct {
+	url    string
+	locale string
+}
+
+// newMetadataSearch acts as a constructor for metadataSearch
+func (client *HearthstoneAPI) newMetadataSearch() cardSearch {
+	// Required parameters
+	return cardSearch{
+		url:    client.apiURL,
+		locale: client.locale,
+	}
+}
+
+func (search *metadataSearch) execute(client *http.Client, token string) interface{} {
+	url := search.url +
+		"hearthstone/metadata/?locale=" +
+		search.locale + "&" +
+		"access_token=" + token
+
+	metadata := Metadata{}
+	err := get(client, url, &metadata)
+
+	if err != nil {
+		panic(err)
+	}
+
+	print(metadata)
+
+	return metadata
 }

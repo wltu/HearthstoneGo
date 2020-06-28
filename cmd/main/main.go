@@ -17,9 +17,13 @@ func main() {
 		return
 	}
 
-	client := api.NewAPI(os.Args[1], os.Args[2], os.Args[3])
+	client := api.NewAPI("en_US", os.Args[1], os.Args[2], os.Args[3])
 	fmt.Println(client.ClientToken)
 
 	client.SearchCard("52119-arch-villain-rafaam")
-	client.SearchCardCollection()
+	fmt.Println()
+	client.SearchCard("56363")
+	// cardCollrection := client.SearchCardCollection()
+
+	// fmt.Println(cardCollrection.Cards[0])
 }

@@ -14,8 +14,11 @@ type HearthstoneAPI struct {
 	ClientID, ClientSecret string
 	ClientToken            string
 
+	locale   string
 	oauthURL string // Hearstone OAuth URL
 	apiURL   string // Regional Hearstone API URL
+
+	metadata Metadata
 
 	heartstoneClient *http.Client
 }
@@ -32,7 +35,7 @@ type endpoint interface {
 }
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
-func NewAPI(region, clientID, clientSecret string) HearthstoneAPI {
+func NewAPI(locale, region, clientID, clientSecret string) HearthstoneAPI {
 	regionMap := map[string]string{
 		"us": "https://us.api.blizzard.com/",
 		"eu": "https://eu.api.blizzard.com/",
@@ -41,10 +44,13 @@ func NewAPI(region, clientID, clientSecret string) HearthstoneAPI {
 		"ch": "https://gateway.battlenet.com.cn/",
 	}
 
-	client := HearthstoneAPI{ClientID: clientID,
+	client := HearthstoneAPI{
+		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
-		apiURL:       regionMap[region]}
+		apiURL:       regionMap[region],
+		locale:       locale,
+	}
 
 	netTransport := &http.Transport{
 		Dial: (&net.Dialer{
@@ -59,6 +65,12 @@ func NewAPI(region, clientID, clientSecret string) HearthstoneAPI {
 	}
 
 	client.connect()
+
+	// search := client.newMetadataSearch()
+
+	// if output, ok := client.execute(&search).(Metadata); ok {
+	// 	client.metadata = output
+	// }
 
 	return client
 }
@@ -75,7 +87,7 @@ func (client *HearthstoneAPI) connect() {
 
 // SearchCard make a API call to search for a card with the given id
 func (client *HearthstoneAPI) SearchCard(id string) Card {
-	cardSearch := client.newCardSearch(id, "en_US")
+	cardSearch := client.newCardSearch(id)
 
 	if output, ok := client.execute(&cardSearch).(Card); ok {
 		return output
@@ -86,7 +98,7 @@ func (client *HearthstoneAPI) SearchCard(id string) Card {
 
 // SearchCardCollection make a API call to search for a set of cards
 func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
-	cardSearch := client.newCardCollectionSearch("en_US")
+	cardSearch := client.newCardCollectionSearch()
 
 	if output, ok := client.execute(&cardSearch).(CardCollection); ok {
 		return output
