@@ -27,7 +27,7 @@ func (heroPower HeroPower) String() string {
 	return fmt.Sprintf("%s: %s", heroPower.Name, heroPower.Text)
 }
 
-// Deck containe all the card information along with hero information about a prebuilt deck in Hearthstone
+// Deck provides card information within a deck
 type Deck struct {
 	DeckCode  string    `json:"deckCode"`
 	Version   int       `json:"version"`
@@ -62,7 +62,7 @@ func (search *deckSearch) execute(client *http.Client, token string) interface{}
 		panic(err)
 	}
 
-	print(deck)
+	// print(deck)
 
 	return deck
 }

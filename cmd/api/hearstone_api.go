@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+// Error is used to handle missing authorization for Hearthstone API
+type Error struct {
+}
+
+func (e *Error) Error() string {
+	return "Required Enviroment Variables Missing! Please include client id and secret."
+}
+
 // HearthstoneAPI connects to Blizzard API for Hearstone Informations
 type HearthstoneAPI struct {
 	// Client Log in information
@@ -37,6 +45,11 @@ type endpoint interface {
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
 func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, bool) {
+
+	if len(clientID) == 0 ||
+		len(clientSecret) == 0 {
+		panic(&Error{})
+	}
 
 	client := HearthstoneAPI{
 		ClientID:     clientID,
@@ -118,11 +131,23 @@ func (client *HearthstoneAPI) SearchCard(id string) Card {
 	return Card{}
 }
 
-// SearchCardCollection make a API call to search for a set of cards
+// SearchCardCollection make a API call to get all cards in Hearthstone
 func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
 	search := client.newCardCollectionSearch()
 
 	if output, ok := client.execute(&search).(CardCollection); ok {
+		page := output.Page
+		totalPage := output.PageCount
+
+		for i := page + 1; i <= totalPage; i++ {
+			search.SetPage(i)
+			if cards, ok := client.execute(&search).(CardCollection); ok {
+				output.Cards = append(output.Cards, cards.Cards...)
+			} else {
+				return CardCollection{}
+			}
+		}
+
 		return output
 	}
 
@@ -140,11 +165,23 @@ func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
 	return CardBack{}
 }
 
-// SearchCardBackCollection make a API call to search for a collection of card backs
+// SearchCardBackCollection make a API call to get all card backs in hearthstone
 func (client *HearthstoneAPI) SearchCardBackCollection() CardBackCollection {
 	search := client.newCardBackCollectionSearch()
 
 	if output, ok := client.execute(&search).(CardBackCollection); ok {
+		page := output.Page
+		totalPage := output.PageCount
+
+		for i := page + 1; i <= totalPage; i++ {
+			search.SetPage(i)
+			if cardBacks, ok := client.execute(&search).(CardBackCollection); ok {
+				output.CardBacks = append(output.CardBacks, cardBacks.CardBacks...)
+			} else {
+				return CardBackCollection{}
+			}
+		}
+
 		return output
 	}
 
@@ -197,3 +234,15 @@ func (client *HearthstoneAPI) execute(request endpoint) interface{} {
 		client.ClientToken,
 	)
 }
+
+// // SearchCard request a specific card by id
+// func (client *HearthstoneAPI) SearchCard(id string) Card
+
+// // SerachCardByName return all cards filtered by the given name
+// func (client *HearthstoneAPI) SerachCardByName(name string) CardCollection
+
+// // BattlegroundCards return all cards of a given tier in battleground
+// func (client *HearthstoneAPI) BattlegroundCards(tier int) CardCollection
+
+// // BattlegroundHeros return all heros in battleground
+// func (client *HearthstoneAPI) BattlegroundHeros() CardCollection

@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 // Card provide information of a Hearthstone card
@@ -79,7 +80,6 @@ func (search *cardSearch) execute(client *http.Client, token string) interface{}
 		"access_token=" + token
 
 	for key, element := range search.optional {
-		fmt.Println("Key:", key, "=>", "Element:", element)
 		url += key + "=" + element + "&"
 	}
 
@@ -90,7 +90,7 @@ func (search *cardSearch) execute(client *http.Client, token string) interface{}
 		panic(err)
 	}
 
-	print(card)
+	// print(card)
 
 	return card
 }
@@ -114,64 +114,80 @@ type cardCollectionSearch struct {
 	optionalInt    map[string]int
 }
 
-// NewCardCollectionSearch acts as a constructor for CardCollectionSearch
+// NewCardCollectionSearch acts as a constructor for cardCollectionSearch
 func (client *HearthstoneAPI) newCardCollectionSearch() cardCollectionSearch {
 	return cardCollectionSearch{
-		url:    client.apiURL,
-		locale: client.locale,
+		url:            client.apiURL,
+		locale:         client.locale,
+		optionalString: make(map[string]string),
+		optionalInt:    make(map[string]int),
 	}
 }
 
-// SetGameMode set the optional parameter of game mode for CardCollectionSearch
+// SetGameMode set the optional parameter of game mode for cardCollectionSearch
 func (search *cardCollectionSearch) SetGameMode(gameMode string) {
 	search.optionalString["gameMode"] = gameMode
 }
 
-// SetCardSet set the optional parameter of card set for CardCollectionSearch
+// SetCardSet set the optional parameter of card set for cardCollectionSearch
 func (search *cardCollectionSearch) SetCardSet(set string) {
 	search.optionalString["set"] = set
 }
 
-// SetClass set the optional parameter of hero class for CardCollectionSearch
+// SetClass set the optional parameter of hero class for cardCollectionSearch
 func (search *cardCollectionSearch) SetClass(class string) {
 	search.optionalString["class"] = class
 }
 
-// SetManaCost set the optional parameter of card mana cost for CardCollectionSearch
+// SetManaCost set the optional parameter of card mana cost for cardCollectionSearch
 func (search *cardCollectionSearch) SetManaCost(manaCost int) {
 	search.optionalInt["manaCost"] = manaCost
 }
 
-// SetAttack set the optional parameter of minion attack for CardCollectionSearch
+// SetTiers set the optional parameter of minion tiers (Battleground Only) for cardCollectionSearch
+func (search *cardCollectionSearch) SetTiers(tiers []int) {
+	output := string(tiers[0])
+	for i := 1; i < len(tiers); i++ {
+		output += "%2C" + string(tiers[i])
+	}
+	search.optionalString["tier"] = output
+}
+
+// SetAttack set the optional parameter of minion attack for cardCollectionSearch
 func (search *cardCollectionSearch) SetAttack(attack int) {
 	search.optionalInt["SetAttack"] = attack
 }
 
-// SetHealth set the optional parameter of minion health for CardCollectionSearch
+// SetHealth set the optional parameter of minion health for cardCollectionSearch
 func (search *cardCollectionSearch) SetHealth(health int) {
 	search.optionalInt["health"] = health
 }
 
-// SetCollectible set the optional parameter of collectible for CardCollectionSearch
+// SetCollectible set the optional parameter of collectible for cardCollectionSearch
 func (search *cardCollectionSearch) SetCollectible(collectible int) {
 	search.optionalInt["collectible"] = collectible
+}
+
+// SetPage set the optional parameter of page number for cardCollectionSearch
+// Not all the requle for the request return all at once
+func (search *cardCollectionSearch) SetPage(page int) {
+	search.optionalInt["page"] = page
 }
 
 func (search *cardCollectionSearch) execute(client *http.Client, token string) interface{} {
 	url := search.url +
 		"hearthstone/cards/?locale=" +
-		search.locale + "&" +
-		"access_token=" + token
+		search.locale + "&"
 
 	for key, element := range search.optionalString {
-		fmt.Println("Key:", key, "=>", "Element:", element)
 		url += key + "=" + element + "&"
 	}
 
 	for key, element := range search.optionalInt {
-		fmt.Println("Key:", key, "=>", "Element:", element)
-		url += key + "=" + string(element) + "&"
+		url += key + "=" + strconv.Itoa(element) + "&"
 	}
+
+	url += "access_token=" + token
 
 	cardCollection := CardCollection{}
 	err := get(client, url, &cardCollection)
@@ -180,7 +196,7 @@ func (search *cardCollectionSearch) execute(client *http.Client, token string) i
 		panic(err)
 	}
 
-	print(cardCollection)
+	// print(cardCollection)
 
 	return cardCollection
 }
