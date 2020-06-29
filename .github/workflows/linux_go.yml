@@ -31,7 +31,10 @@ jobs:
         fi
 
     - name: Build
-      run: go build ./cmd/main/main.go
+      run: go build ./cmd/api
 
     - name: Test
+      env:
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       run: go test ./internal/test
