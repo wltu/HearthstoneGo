@@ -59,11 +59,3 @@ func TestFakeBattleGroundsCard(t *testing.T) {
 		t.Errorf("Card should be missing, but found %s!", card.Name)
 	}
 }
-
-func TestCardCollection(t *testing.T) {
-	cards := client.SearchCardCollection()
-
-	if cards.CardCount != len(cards.Cards) {
-		t.Errorf("Card count should be %d, but got %d!", cards.CardCount, len(cards.Cards))
-	}
-}

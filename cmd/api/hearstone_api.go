@@ -27,9 +27,18 @@ type HearthstoneAPI struct {
 	oauthURL  string // Hearstone OAuth URL
 	apiURL    string // Regional Hearstone API URL
 
-	metadata Metadata
-
 	heartstoneClient *http.Client
+
+	// Metadata to filter the cards
+	sets               []string
+	setGroups          []string
+	types              []string
+	rarities           []string
+	classes            []string
+	minionTypes        []string
+	gameModes          []string
+	keywords           []string
+	cardBackCategories []string
 }
 
 // Authorization is the json structure returned after OAuth
@@ -91,7 +100,7 @@ func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, boo
 	search := client.newMetadataSearch()
 
 	if output, ok := client.execute(&search).(Metadata); ok {
-		client.metadata = output
+		client.setMetadata(&output)
 	} else {
 		return nil, false
 	}

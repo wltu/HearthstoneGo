@@ -134,3 +134,108 @@ func (search *metadataSearch) execute(client *http.Client, token string) interfa
 
 	return metadata
 }
+
+func (client *HearthstoneAPI) setMetadata(metadata *Metadata) {
+	size := len(metadata.Sets)
+	client.sets = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.sets[i] = metadata.Sets[i].Slug
+	}
+
+	size = len(metadata.SetGroups)
+	client.setGroups = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.setGroups[i] = metadata.SetGroups[i].Slug
+	}
+
+	size = len(metadata.Types)
+	client.types = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.types[i] = metadata.Types[i].Slug
+	}
+
+	size = len(metadata.Rarities)
+	client.rarities = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.rarities[i] = metadata.Rarities[i].Slug
+	}
+
+	size = len(metadata.Classes)
+	client.classes = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.classes[i] = metadata.Classes[i].Slug
+	}
+
+	size = len(metadata.MinionTypes)
+	client.minionTypes = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.minionTypes[i] = metadata.MinionTypes[i].Slug
+	}
+
+	size = len(metadata.GameModes)
+	client.gameModes = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.gameModes[i] = metadata.GameModes[i].Slug
+	}
+
+	size = len(metadata.Keywords)
+	client.keywords = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.keywords[i] = metadata.Keywords[i].Slug
+	}
+
+	size = len(metadata.CardBackCategories)
+	client.cardBackCategories = make([]string, size)
+
+	for i := 0; i < size; i++ {
+		client.cardBackCategories[i] = metadata.CardBackCategories[i].Slug
+	}
+}
+
+// Sets returns all the available card sets in Hearthstone
+func (client *HearthstoneAPI) Sets() []string {
+	return client.sets
+}
+
+// SetGroups returns all the available card set groups in Hearthstone
+func (client *HearthstoneAPI) SetGroups() []string {
+	return client.setGroups
+}
+
+// Types returns all the available card types in Hearthstone
+func (client *HearthstoneAPI) Types() []string {
+	return client.types
+}
+
+// Rarities returns all the available card rarities in Hearthstone
+func (client *HearthstoneAPI) Rarities() []string {
+	return client.rarities
+}
+
+// Classes returns all the available hero classes in Hearthstone
+func (client *HearthstoneAPI) Classes() []string {
+	return client.classes
+}
+
+// MinionTypes returns all the available card minion types in Hearthstone
+func (client *HearthstoneAPI) MinionTypes() []string {
+	return client.minionTypes
+}
+
+// Keywords returns all the available card keywords in Hearthstone
+func (client *HearthstoneAPI) Keywords() []string {
+	return client.keywords
+}
+
+// CardBackCategories returns all the available categories of card backs in Hearthstone
+func (client *HearthstoneAPI) CardBackCategories() []string {
+	return client.cardBackCategories
+}

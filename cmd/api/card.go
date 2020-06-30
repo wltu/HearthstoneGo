@@ -117,7 +117,7 @@ func (search *cardSearch) execute(client *http.Client, token string) interface{}
 }
 
 // SearchCard request a specific card by id
-// Output will be the card and a vailidity check.
+// Output will be the card and a validity check.
 // It will return true if the card is found and is a constructed card, otherwise false.
 func (client *HearthstoneAPI) SearchCard(id string) (Card, bool) {
 	search := client.newCardSearch(id)
@@ -136,7 +136,7 @@ func (client *HearthstoneAPI) SearchCard(id string) (Card, bool) {
 }
 
 // SearchBattlegroundsCard request a specific battlegrounds card by id
-// Output will be the card and a vailidity check.
+// Output will be the card and a validity check.
 // It will return true if the card is found and is a battlegrounds card, otherwise false.
 func (client *HearthstoneAPI) SearchBattlegroundsCard(id string) (Card, bool) {
 	search := client.newCardSearch(id)
