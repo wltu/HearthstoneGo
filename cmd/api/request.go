@@ -44,6 +44,7 @@ func post(client *http.Client, url string, target interface{}) error {
 }
 
 func get(client *http.Client, url string, target interface{}) error {
+	fmt.Println("URL:", url)
 	request, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {

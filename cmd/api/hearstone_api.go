@@ -109,85 +109,6 @@ func (client *HearthstoneAPI) connect() {
 	client.ClientToken = auth.AccessToken
 }
 
-// SearchDeck make a API call to search for a deck with the given id
-func (client *HearthstoneAPI) SearchDeck(id string) Deck {
-	search := client.newDeckSearch(id)
-
-	if output, ok := client.execute(&search).(Deck); ok {
-		return output
-	}
-
-	return Deck{}
-}
-
-// SearchCard make a API call to search for a card with the given id
-func (client *HearthstoneAPI) SearchCard(id string) Card {
-	search := client.newCardSearch(id)
-
-	if output, ok := client.execute(&search).(Card); ok {
-		return output
-	}
-
-	return Card{}
-}
-
-// SearchCardCollection make a API call to get all cards in Hearthstone
-func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
-	search := client.newCardCollectionSearch()
-
-	if output, ok := client.execute(&search).(CardCollection); ok {
-		page := output.Page
-		totalPage := output.PageCount
-
-		for i := page + 1; i <= totalPage; i++ {
-			search.SetPage(i)
-			if cards, ok := client.execute(&search).(CardCollection); ok {
-				output.Cards = append(output.Cards, cards.Cards...)
-			} else {
-				return CardCollection{}
-			}
-		}
-
-		return output
-	}
-
-	return CardCollection{}
-}
-
-// SearchCardBack make a API call to search for a card back with the given id
-func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
-	search := client.newCardBackSearch(id)
-
-	if output, ok := client.execute(&search).(CardBack); ok {
-		return output
-	}
-
-	return CardBack{}
-}
-
-// SearchCardBackCollection make a API call to get all card backs in hearthstone
-func (client *HearthstoneAPI) SearchCardBackCollection() CardBackCollection {
-	search := client.newCardBackCollectionSearch()
-
-	if output, ok := client.execute(&search).(CardBackCollection); ok {
-		page := output.Page
-		totalPage := output.PageCount
-
-		for i := page + 1; i <= totalPage; i++ {
-			search.SetPage(i)
-			if cardBacks, ok := client.execute(&search).(CardBackCollection); ok {
-				output.CardBacks = append(output.CardBacks, cardBacks.CardBacks...)
-			} else {
-				return CardBackCollection{}
-			}
-		}
-
-		return output
-	}
-
-	return CardBackCollection{}
-}
-
 func print(body interface{}) {
 	var value reflect.Value
 
@@ -234,15 +155,3 @@ func (client *HearthstoneAPI) execute(request endpoint) interface{} {
 		client.ClientToken,
 	)
 }
-
-// // SearchCard request a specific card by id
-// func (client *HearthstoneAPI) SearchCard(id string) Card
-
-// // SerachCardByName return all cards filtered by the given name
-// func (client *HearthstoneAPI) SerachCardByName(name string) CardCollection
-
-// // BattlegroundCards return all cards of a given tier in battleground
-// func (client *HearthstoneAPI) BattlegroundCards(tier int) CardCollection
-
-// // BattlegroundHeros return all heros in battleground
-// func (client *HearthstoneAPI) BattlegroundHeros() CardCollection

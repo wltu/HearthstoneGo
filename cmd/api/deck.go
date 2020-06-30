@@ -66,3 +66,14 @@ func (search *deckSearch) execute(client *http.Client, token string) interface{}
 
 	return deck
 }
+
+// SearchDeck make a API call to search for a deck with the given id
+func (client *HearthstoneAPI) SearchDeck(id string) Deck {
+	search := client.newDeckSearch(id)
+
+	if output, ok := client.execute(&search).(Deck); ok {
+		return output
+	}
+
+	return Deck{}
+}
