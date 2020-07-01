@@ -25,11 +25,3 @@ func TestFakeCardBack(t *testing.T) {
 		t.Errorf("Card back ID should be %d, but got %d!", 0, cardBack.ID)
 	}
 }
-
-func TestCardBackCollection(t *testing.T) {
-	cardBacks := client.SearchCardBackCollection()
-
-	if cardBacks.CardCount != len(cardBacks.CardBacks) {
-		t.Errorf("Card back count should be %d, but got %d!", cardBacks.CardCount, len(cardBacks.CardBacks))
-	}
-}

@@ -8,6 +8,38 @@ import (
 	"time"
 )
 
+var localeMap = map[string]string{
+	"USA":           "en_US",
+	"Mexico":        "es_MX",
+	"Brazil":        "pt_BR",
+	"Great Britain": "en_GB",
+	"Spain":         "es_ES",
+	"France":        "fr_FR",
+	"Russia":        "ru_RU",
+	"Germany":       "de_DE",
+	"Portugal":      "pt_PT",
+	"Italy":         "it_IT",
+	"Korea":         "ko_KR",
+	"Taiwan":        "zh_TW",
+	"China":         "zh_CH",
+}
+
+var regionMap = map[string]string{
+	"USA":           "us",
+	"Mexico":        "us",
+	"Brazil":        "us",
+	"Great Britain": "eu",
+	"Spain":         "eu",
+	"France":        "eu",
+	"Russia":        "eu",
+	"Germany":       "eu",
+	"Portugal":      "eu",
+	"Italy":         "eu",
+	"Korea":         "kr",
+	"Taiwan":        "tw",
+	"China":         "kr",
+}
+
 // Error is used to handle missing authorization for Hearthstone API
 type Error struct {
 }
@@ -22,14 +54,28 @@ type HearthstoneAPI struct {
 	ClientID, ClientSecret string
 	ClientToken            string
 
-	localeMap map[string]string
-	locale    string
-	oauthURL  string // Hearstone OAuth URL
-	apiURL    string // Regional Hearstone API URL
-
-	metadata Metadata
+	locale   string
+	oauthURL string // Hearstone OAuth URL
+	apiURL   string // Regional Hearstone API URL
 
 	heartstoneClient *http.Client
+
+	// Card Collection Search
+	cardSearch *cardCollectionSearch
+
+	// Card Back Collection Search
+	cardBackSearch *cardBackCollectionSearch
+
+	// Metadata to filter the cards
+	sets               []string
+	setGroups          []string
+	types              []string
+	rarities           []string
+	classes            []string
+	minionTypes        []string
+	gameModes          []string
+	keywords           []string
+	cardBackCategories []string
 }
 
 // Authorization is the json structure returned after OAuth
@@ -44,7 +90,24 @@ type endpoint interface {
 }
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
-func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, bool) {
+func NewAPI(location, clientID, clientSecret string) (*HearthstoneAPI, bool) {
+
+	locale, ok := localeMap[location]
+
+	if !ok {
+		message := "The supported region includes "
+		for key := range localeMap {
+			message += key + ", "
+		}
+
+		temp := []rune(message)
+
+		message = string(temp[:len(message)-2])
+
+		fmt.Println(message)
+
+		return nil, false
+	}
 
 	if len(clientID) == 0 ||
 		len(clientSecret) == 0 {
@@ -55,23 +118,8 @@ func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, boo
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
-		apiURL:       "https://" + region + ".api.blizzard.com/",
+		apiURL:       "https://" + regionMap[location] + ".api.blizzard.com/",
 		locale:       locale,
-		localeMap: map[string]string{
-			"USA":           "en_US",
-			"Mexico":        "es_MX",
-			"Brazil":        "pt_BR",
-			"Great Britain": "en_GB",
-			"Spain":         "es_ES",
-			"France":        "fr_FR",
-			"Russia":        "ru_RU",
-			"Germany":       "de_DE",
-			"Portugal":      "pt_PT",
-			"Italy":         "it_IT",
-			"Korea":         "ko_KR",
-			"Taiwan":        "zh_TW",
-			"China":         "zh_CH",
-		},
 	}
 
 	netTransport := &http.Transport{
@@ -91,7 +139,7 @@ func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, boo
 	search := client.newMetadataSearch()
 
 	if output, ok := client.execute(&search).(Metadata); ok {
-		client.metadata = output
+		client.setMetadata(&output)
 	} else {
 		return nil, false
 	}
@@ -107,85 +155,6 @@ func (client *HearthstoneAPI) connect() {
 	}
 
 	client.ClientToken = auth.AccessToken
-}
-
-// SearchDeck make a API call to search for a deck with the given id
-func (client *HearthstoneAPI) SearchDeck(id string) Deck {
-	search := client.newDeckSearch(id)
-
-	if output, ok := client.execute(&search).(Deck); ok {
-		return output
-	}
-
-	return Deck{}
-}
-
-// SearchCard make a API call to search for a card with the given id
-func (client *HearthstoneAPI) SearchCard(id string) Card {
-	search := client.newCardSearch(id)
-
-	if output, ok := client.execute(&search).(Card); ok {
-		return output
-	}
-
-	return Card{}
-}
-
-// SearchCardCollection make a API call to get all cards in Hearthstone
-func (client *HearthstoneAPI) SearchCardCollection() CardCollection {
-	search := client.newCardCollectionSearch()
-
-	if output, ok := client.execute(&search).(CardCollection); ok {
-		page := output.Page
-		totalPage := output.PageCount
-
-		for i := page + 1; i <= totalPage; i++ {
-			search.SetPage(i)
-			if cards, ok := client.execute(&search).(CardCollection); ok {
-				output.Cards = append(output.Cards, cards.Cards...)
-			} else {
-				return CardCollection{}
-			}
-		}
-
-		return output
-	}
-
-	return CardCollection{}
-}
-
-// SearchCardBack make a API call to search for a card back with the given id
-func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
-	search := client.newCardBackSearch(id)
-
-	if output, ok := client.execute(&search).(CardBack); ok {
-		return output
-	}
-
-	return CardBack{}
-}
-
-// SearchCardBackCollection make a API call to get all card backs in hearthstone
-func (client *HearthstoneAPI) SearchCardBackCollection() CardBackCollection {
-	search := client.newCardBackCollectionSearch()
-
-	if output, ok := client.execute(&search).(CardBackCollection); ok {
-		page := output.Page
-		totalPage := output.PageCount
-
-		for i := page + 1; i <= totalPage; i++ {
-			search.SetPage(i)
-			if cardBacks, ok := client.execute(&search).(CardBackCollection); ok {
-				output.CardBacks = append(output.CardBacks, cardBacks.CardBacks...)
-			} else {
-				return CardBackCollection{}
-			}
-		}
-
-		return output
-	}
-
-	return CardBackCollection{}
 }
 
 func print(body interface{}) {
@@ -229,20 +198,12 @@ func print(body interface{}) {
 }
 
 func (client *HearthstoneAPI) execute(request endpoint) interface{} {
+	if request == nil {
+		return nil
+	}
+
 	return request.execute(
 		client.heartstoneClient,
 		client.ClientToken,
 	)
 }
-
-// // SearchCard request a specific card by id
-// func (client *HearthstoneAPI) SearchCard(id string) Card
-
-// // SerachCardByName return all cards filtered by the given name
-// func (client *HearthstoneAPI) SerachCardByName(name string) CardCollection
-
-// // BattlegroundCards return all cards of a given tier in battleground
-// func (client *HearthstoneAPI) BattlegroundCards(tier int) CardCollection
-
-// // BattlegroundHeros return all heros in battleground
-// func (client *HearthstoneAPI) BattlegroundHeros() CardCollection

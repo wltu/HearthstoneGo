@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 )
 
 type cardBackSearch struct {
@@ -44,88 +43,18 @@ func (search *cardBackSearch) execute(client *http.Client, token string) interfa
 		panic(err)
 	}
 
-	print(cardBack)
-
-	return cardBack
-}
-
-type cardBackCollectionSearch struct {
-	// Required Parameters
-	url    string
-	locale string
-
-	// Optional Parameters
-	optionalString map[string]string
-	optionalInt    map[string]int
-}
-
-// CardBackCollection provide information of a set of Card Backs
-type CardBackCollection struct {
-	CardBacks []CardBack `json:"cardBacks"`
-	CardCount int        `json:"cardCount"`
-	PageCount int        `json:"pageCount"`
-	Page      int        `json:"page"`
-}
-
-func (client *HearthstoneAPI) newCardBackCollectionSearch() cardBackCollectionSearch {
-	// Required parameters
-	return cardBackCollectionSearch{
-		url:            client.apiURL,
-		locale:         client.locale,
-		optionalString: make(map[string]string),
-		optionalInt:    make(map[string]int),
-	}
-}
-
-// SetCategory set the optional parameter of Category for CardBackCollectionSearch
-func (search *cardBackCollectionSearch) SetCategory(category string) {
-	search.optionalString["cardBackCategory"] = category
-}
-
-// SetTextFilter set the optional parameter of text filter for CardBackCollectionSearch
-func (search *cardBackCollectionSearch) SetTextFilter(textFilter string) {
-	search.optionalString["textFilter"] = textFilter
-}
-
-// SetCategory set the optional parameter of the field to use to sort for CardBackCollectionSearch
-func (search *cardBackCollectionSearch) SetSort(sort string) {
-	search.optionalString["sort"] = sort
-}
-
-// SetOrder set the optional parameter of how to use the field to sort CardBackCollectionSearch
-func (search *cardBackCollectionSearch) SetOrder(order string) {
-	search.optionalString["order"] = order
-}
-
-// SetPage set the optional parameter of page number for cardBackCollectionSearch
-// Not all the requle for the request return all at once
-func (search *cardBackCollectionSearch) SetPage(page int) {
-	search.optionalInt["page"] = page
-}
-
-func (search *cardBackCollectionSearch) execute(client *http.Client, token string) interface{} {
-	url := search.url +
-		"hearthstone/cardbacks/?locale=" +
-		search.locale + "&"
-
-	for key, element := range search.optionalString {
-		url += key + "=" + element + "&"
-	}
-
-	for key, element := range search.optionalInt {
-		url += key + "=" + strconv.Itoa(element) + "&"
-	}
-
-	url += "access_token=" + token
-
-	cardBack := CardBackCollection{}
-	err := get(client, url, &cardBack)
-
-	if err != nil {
-		panic(err)
-	}
-
 	// print(cardBack)
 
 	return cardBack
+}
+
+// SearchCardBack make a API call to search for a card back with the given id
+func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
+	search := client.newCardBackSearch(id)
+
+	if output, ok := client.execute(&search).(CardBack); ok {
+		return output
+	}
+
+	return CardBack{}
 }
