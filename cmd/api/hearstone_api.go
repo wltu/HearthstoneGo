@@ -24,6 +24,22 @@ var localeMap = map[string]string{
 	"China":         "zh_CH",
 }
 
+var regionMap = map[string]string{
+	"USA":           "us",
+	"Mexico":        "us",
+	"Brazil":        "us",
+	"Great Britain": "eu",
+	"Spain":         "eu",
+	"France":        "eu",
+	"Russia":        "eu",
+	"Germany":       "eu",
+	"Portugal":      "eu",
+	"Italy":         "eu",
+	"Korea":         "kr",
+	"Taiwan":        "tw",
+	"China":         "kr",
+}
+
 // Error is used to handle missing authorization for Hearthstone API
 type Error struct {
 }
@@ -74,7 +90,24 @@ type endpoint interface {
 }
 
 // NewAPI acts as a constructor to initialize the HearstoneAPI
-func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, bool) {
+func NewAPI(location, clientID, clientSecret string) (*HearthstoneAPI, bool) {
+
+	locale, ok := localeMap[location]
+
+	if !ok {
+		message := "The supported region includes "
+		for key := range localeMap {
+			message += key + ", "
+		}
+
+		temp := []rune(message)
+
+		message = string(temp[:len(message)-2])
+
+		fmt.Println(message)
+
+		return nil, false
+	}
 
 	if len(clientID) == 0 ||
 		len(clientSecret) == 0 {
@@ -85,7 +118,7 @@ func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, boo
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
-		apiURL:       "https://" + region + ".api.blizzard.com/",
+		apiURL:       "https://" + regionMap[location] + ".api.blizzard.com/",
 		locale:       locale,
 	}
 
