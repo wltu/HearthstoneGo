@@ -6,7 +6,7 @@ import (
 
 func TestCard(t *testing.T) {
 
-	if card, ok := client.SearchCard("52119-arch-villain-rafaam"); ok {
+	if card := client.SearchCard("52119-arch-villain-rafaam"); card != nil {
 		if card.Name != "Arch-Villain Rafaam" {
 			t.Errorf("Card name should be %s, but got %s!", "Arch-Villain Rafaam", card.Name)
 		}
@@ -20,19 +20,19 @@ func TestCard(t *testing.T) {
 }
 
 func TestBattleGroundOnlyCard(t *testing.T) {
-	if card, ok := client.SearchCard("60040-zapp-slywick"); ok {
+	if card := client.SearchCard("60040-zapp-slywick"); card != nil {
 		t.Errorf("Card should be battleground only. Got %s!", card)
 	}
 }
 func TestFakeCard(t *testing.T) {
-	if card, ok := client.SearchCard("1111"); ok {
+	if card := client.SearchCard("1111"); card != nil {
 		t.Errorf("Card should be missing, but found %s!", card.Name)
 	}
 }
 
 func TestBattlegroundsCard(t *testing.T) {
 
-	if card, ok := client.SearchBattlegroundsCard("60040-zapp-slywick"); ok {
+	if card := client.SearchBattlegroundsCard("60040-zapp-slywick"); card != nil {
 		if card.Name != "Zapp Slywick" {
 			t.Errorf("Card name should be %s, but got %s!", "Zapp Slywick", card.Name)
 		}
@@ -50,12 +50,12 @@ func TestBattlegroundsCard(t *testing.T) {
 }
 
 func TestConstructedOnlyCard(t *testing.T) {
-	if card, ok := client.SearchBattlegroundsCard("52119-arch-villain-rafaam"); ok {
+	if card := client.SearchBattlegroundsCard("52119-arch-villain-rafaam"); card != nil {
 		t.Errorf("Card should be battleground only. Got %s!", card)
 	}
 }
 func TestFakeBattleGroundsCard(t *testing.T) {
-	if card, ok := client.SearchBattlegroundsCard("1111"); ok {
+	if card := client.SearchBattlegroundsCard("1111"); card != nil {
 		t.Errorf("Card should be missing, but found %s!", card.Name)
 	}
 }

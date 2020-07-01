@@ -29,6 +29,9 @@ type HearthstoneAPI struct {
 
 	heartstoneClient *http.Client
 
+	// Card Collection Search
+	cardSearch *cardCollectionSearch
+
 	// Metadata to filter the cards
 	sets               []string
 	setGroups          []string
@@ -159,6 +162,10 @@ func print(body interface{}) {
 }
 
 func (client *HearthstoneAPI) execute(request endpoint) interface{} {
+	if request == nil {
+		return nil
+	}
+
 	return request.execute(
 		client.heartstoneClient,
 		client.ClientToken,

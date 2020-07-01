@@ -80,18 +80,6 @@ func (card Card) String() string {
 		card.Attack, card.Health)
 }
 
-func (search *cardSearch) setID(id string) {
-	search.id = id
-}
-
-func (search *cardSearch) setLocale(locale string) {
-	search.locale = locale
-}
-
-func (search *cardSearch) setGameMode(gameMode string) {
-	search.optional["gameMode"] = gameMode
-}
-
 func (search *cardSearch) execute(client *http.Client, token string) interface{} {
 	url := search.url +
 		"hearthstone/cards/" +
@@ -117,40 +105,36 @@ func (search *cardSearch) execute(client *http.Client, token string) interface{}
 }
 
 // SearchCard request a specific card by id
-// Output will be the card and a validity check.
-// It will return true if the card is found and is a constructed card, otherwise false.
-func (client *HearthstoneAPI) SearchCard(id string) (Card, bool) {
+func (client *HearthstoneAPI) SearchCard(id string) *Card {
 	search := client.newCardSearch(id)
 
 	if output, ok := client.execute(&search).(Card); ok {
 		if output.Error.Status != 0 {
-			return Card{}, false
+			return nil
 		}
 
 		if output.Collectible == 1 {
-			return output, true
+			return &output
 		}
 	}
 
-	return Card{}, false
+	return nil
 }
 
 // SearchBattlegroundsCard request a specific battlegrounds card by id
-// Output will be the card and a validity check.
-// It will return true if the card is found and is a battlegrounds card, otherwise false.
-func (client *HearthstoneAPI) SearchBattlegroundsCard(id string) (Card, bool) {
+func (client *HearthstoneAPI) SearchBattlegroundsCard(id string) *Card {
 	search := client.newCardSearch(id)
-	search.setGameMode("battlegrounds")
+	search.optional["gameMode"] = "battlegrounds"
 
 	if output, ok := client.execute(&search).(Card); ok {
 		if output.Error.Status != 0 {
-			return Card{}, false
+			return nil
 		}
 
 		if output.Battlegrounds != (Battlegrounds{}) {
-			return output, true
+			return &output
 		}
 	}
 
-	return Card{}, false
+	return nil
 }
