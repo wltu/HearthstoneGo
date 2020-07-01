@@ -8,6 +8,22 @@ import (
 	"time"
 )
 
+var localeMap = map[string]string{
+	"USA":           "en_US",
+	"Mexico":        "es_MX",
+	"Brazil":        "pt_BR",
+	"Great Britain": "en_GB",
+	"Spain":         "es_ES",
+	"France":        "fr_FR",
+	"Russia":        "ru_RU",
+	"Germany":       "de_DE",
+	"Portugal":      "pt_PT",
+	"Italy":         "it_IT",
+	"Korea":         "ko_KR",
+	"Taiwan":        "zh_TW",
+	"China":         "zh_CH",
+}
+
 // Error is used to handle missing authorization for Hearthstone API
 type Error struct {
 }
@@ -22,15 +38,17 @@ type HearthstoneAPI struct {
 	ClientID, ClientSecret string
 	ClientToken            string
 
-	localeMap map[string]string
-	locale    string
-	oauthURL  string // Hearstone OAuth URL
-	apiURL    string // Regional Hearstone API URL
+	locale   string
+	oauthURL string // Hearstone OAuth URL
+	apiURL   string // Regional Hearstone API URL
 
 	heartstoneClient *http.Client
 
 	// Card Collection Search
 	cardSearch *cardCollectionSearch
+
+	// Card Back Collection Search
+	cardBackSearch *cardBackCollectionSearch
 
 	// Metadata to filter the cards
 	sets               []string
@@ -69,21 +87,6 @@ func NewAPI(locale, region, clientID, clientSecret string) (*HearthstoneAPI, boo
 		oauthURL:     "https://us.battle.net/oauth/token?grant_type=client_credentials",
 		apiURL:       "https://" + region + ".api.blizzard.com/",
 		locale:       locale,
-		localeMap: map[string]string{
-			"USA":           "en_US",
-			"Mexico":        "es_MX",
-			"Brazil":        "pt_BR",
-			"Great Britain": "en_GB",
-			"Spain":         "es_ES",
-			"France":        "fr_FR",
-			"Russia":        "ru_RU",
-			"Germany":       "de_DE",
-			"Portugal":      "pt_PT",
-			"Italy":         "it_IT",
-			"Korea":         "ko_KR",
-			"Taiwan":        "zh_TW",
-			"China":         "zh_CH",
-		},
 	}
 
 	netTransport := &http.Transport{
