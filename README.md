@@ -16,7 +16,7 @@ go get github.com/wltu/HearthstoneGo
 
 ### Simple Example
 The `CLIENT_ID` and `CLIENT_SECRET` is created for the Blizzard API. Please follow the instruction [here](https://develop.battle.net/documentation/guides/getting-started) to create your own to use the library.
-```
+```golang
 package main
 
 import (
