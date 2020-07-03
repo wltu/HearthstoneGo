@@ -48,6 +48,16 @@ type Card struct {
 	Error         CardError     `json:"error"`
 }
 
+// CardImage download card image and return saved location
+func (client *HearthstoneAPI) CardImage(card *Card) string {
+	return getImage(client.heartstoneClient, card.Slug, card.Image)
+}
+
+// // GoldCardImage download golden card image and return saved location
+// func (card *Card) GoldCardImage(id string) string {
+
+// }
+
 type cardSearch struct {
 	// Required Parameters
 	url    string

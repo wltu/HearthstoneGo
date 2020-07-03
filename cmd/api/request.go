@@ -3,9 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func (client *HearthstoneAPI) authorization(url string, authorization *Authorization) error {
@@ -40,6 +42,8 @@ func post(client *http.Client, url string, target interface{}) error {
 		return err
 	}
 
+	defer res.Body.Close()
+
 	return json.NewDecoder(res.Body).Decode(target)
 }
 
@@ -55,8 +59,37 @@ func get(client *http.Client, url string, target interface{}) error {
 	if err != nil {
 		panic(err)
 	}
+	defer res.Body.Close()
 
 	return json.NewDecoder(res.Body).Decode(target)
+}
+
+func getImage(client *http.Client, name, url string) string {
+	request, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := client.Do(request)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer res.Body.Close()
+
+	imageFile, err := os.Create("./images/" + name + ".png")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer imageFile.Close()
+
+	io.Copy(imageFile, res.Body)
+
+	return imageFile.Name()
 }
 
 func readBody(res http.Response) {
