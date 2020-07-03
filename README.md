@@ -36,7 +36,12 @@ func main() {
 		fmt.Println(client.ClientToken)
 
 		// Search for single card.
-		client.SearchCard("52119-arch-villain-rafaam")
+
+		if card :=
+			client.SearchCard("52119-arch-villain-rafaam"); card != nil {
+			fmt.Println(client.CardImage(card, false))
+			fmt.Println(client.GoldCardImage(card, false))
+		}
 
 		// Search for single card back.
 		client.SearchCardBack("155-pizza-stone")
@@ -46,9 +51,41 @@ func main() {
 
 		// Set optional parameters.
 		// Visit card_collection.go for more info.
-		client.SetCardTextFilter("lookout")
+		client.SetCardTextFilter("hydra")
 
-		client.EndCardCollectionSearch()
+		if cards :=
+			client.EndCardCollectionSearch(); cards != nil {
+			fmt.Println(client.CardCollectionImage(cards, false))
+			fmt.Println(client.GoldCardCollectionImage(cards, false))
+		}
+
+		// Search for single battlegrounds card
+		if card :=
+			client.SearchBattlegroundsCard(
+				"60040-zapp-slywick"); card != nil {
+			fmt.Println(client.CardImage(card, true))
+			fmt.Println(client.GoldCardImage(card, true))
+		}
+
+		// Search for set of battlegrouds cards
+		client.BeginCardCollectionSearch()
+		client.SetCardGameMode("battlegrounds")
+		client.SetCardTiers([]int{
+			6,
+		})
+
+		if cards :=
+			client.EndCardCollectionSearch(); cards != nil {
+			fmt.Println(client.CardCollectionImage(cards, true))
+			fmt.Println(client.GoldCardCollectionImage(cards, true))
+		}
+
+		// Search  for a single card back
+		if cardBack :=
+			client.SearchCardBack(
+				"155-pizza-stone"); cardBack != nil {
+			fmt.Println(client.CardBackImage(cardBack))
+		}
 
 		// Search for a set of card backs
 		client.BeginCardBackCollectionSearch()
@@ -59,11 +96,16 @@ func main() {
 
 		client.SetCardTextFilter("lookout")
 
-		client.EndCardBackCollectionSearch()
+		if cardBacks :=
+			client.EndCardBackCollectionSearch(); cardBacks != nil {
+			fmt.Println(client.CardBackCollectionImage(cardBacks))
+		}
 
 		// Search for deck
 		id := "AAECAQcG+wyd8AKS+AKggAOblAPanQMMS6IE/web8wLR9QKD+wKe+wKz/AL1gAOXlAOalAOSnwMA"
-		client.SearchDeck(id)
+		if deck := client.SearchDeck(id); deck != nil {
+			fmt.Println(client.DeckImage(deck))
+		}
 
 	} else {
 		fmt.Println("Error in setting up HearthstoneAPI Client!")
@@ -71,7 +113,6 @@ func main() {
 }
 
 ```
-
 
 ## Project Structure
 This project follows loosely the proejct structure [here](https://github.com/golang-standards/project-layout).

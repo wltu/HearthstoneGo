@@ -5,6 +5,24 @@ import (
 	"strconv"
 )
 
+// CardBackCollection provide information of a set of Card Backs
+type CardBackCollection struct {
+	CardBacks []CardBack `json:"cardBacks"`
+	CardCount int        `json:"cardCount"`
+	PageCount int        `json:"pageCount"`
+	Page      int        `json:"page"`
+}
+
+// CardBackCollectionImage download card back images and return saved location
+func (client *HearthstoneAPI) CardBackCollectionImage(cardBacks *CardBackCollection) []string {
+	output := make([]string, len(cardBacks.CardBacks))
+	for i, cardBack := range cardBacks.CardBacks {
+		output[i] = getImage(client.heartstoneClient, cardBack.Slug, cardBack.Image, false)
+	}
+
+	return output
+}
+
 type cardBackCollectionSearch struct {
 	// Required Parameters
 	url    string
@@ -13,14 +31,6 @@ type cardBackCollectionSearch struct {
 	// Optional Parameters
 	optionalString map[string]string
 	optionalInt    map[string]int
-}
-
-// CardBackCollection provide information of a set of Card Backs
-type CardBackCollection struct {
-	CardBacks []CardBack `json:"cardBacks"`
-	CardCount int        `json:"cardCount"`
-	PageCount int        `json:"pageCount"`
-	Page      int        `json:"page"`
 }
 
 func (client *HearthstoneAPI) newCardBackCollectionSearch() *cardBackCollectionSearch {

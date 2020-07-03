@@ -64,9 +64,12 @@ func get(client *http.Client, url string, target interface{}) error {
 	return json.NewDecoder(res.Body).Decode(target)
 }
 
-func getImage(client *http.Client, name, url string) string {
-	request, err := http.NewRequest("GET", url, nil)
+func getImage(client *http.Client, name, url string, golden bool) string {
+	if url == "" {
+		return "Not Available!"
+	}
 
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +82,15 @@ func getImage(client *http.Client, name, url string) string {
 
 	defer res.Body.Close()
 
-	imageFile, err := os.Create("./images/" + name + ".png")
+	fileName := "./images/" + name
+
+	if golden {
+		fileName += "-golden.png"
+	} else {
+		fileName += ".png"
+	}
+
+	imageFile, err := os.Create(fileName)
 
 	if err != nil {
 		panic(err)
