@@ -39,6 +39,17 @@ type Deck struct {
 	CardCount int       `json:"cardCount"`
 }
 
+// DeckImage download all card images in a deck and return saved location
+func (client *HearthstoneAPI) DeckImage(deck *Deck) []string {
+
+	output := make([]string, len(deck.Cards))
+	for i, card := range deck.Cards {
+		output[i] = getImage(client.heartstoneClient, card.Slug, card.Image, false)
+	}
+
+	return output
+}
+
 func (client *HearthstoneAPI) newDeckSearch(id string) deckSearch {
 	// Required parameters
 	return deckSearch{
@@ -68,12 +79,12 @@ func (search *deckSearch) execute(client *http.Client, token string) interface{}
 }
 
 // SearchDeck make a API call to search for a deck with the given id
-func (client *HearthstoneAPI) SearchDeck(id string) Deck {
+func (client *HearthstoneAPI) SearchDeck(id string) *Deck {
 	search := client.newDeckSearch(id)
 
 	if output, ok := client.execute(&search).(Deck); ok {
-		return output
+		return &output
 	}
 
-	return Deck{}
+	return nil
 }

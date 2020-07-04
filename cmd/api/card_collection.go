@@ -13,6 +13,38 @@ type CardCollection struct {
 	Page      int    `json:"page"`
 }
 
+// CardCollectionImage download card images and return saved location
+func (client *HearthstoneAPI) CardCollectionImage(cards *CardCollection, battlegrounds bool) []string {
+
+	output := make([]string, len(cards.Cards))
+	for i, card := range cards.Cards {
+		image := card.Image
+
+		if battlegrounds {
+			image = card.Battlegrounds.Image
+		}
+		output[i] = getImage(client.heartstoneClient, card.Slug, image, false)
+	}
+
+	return output
+}
+
+// GoldCardCollectionImage download golden card images and return saved location
+func (client *HearthstoneAPI) GoldCardCollectionImage(cards *CardCollection, battlegrounds bool) []string {
+	output := make([]string, len(cards.Cards))
+
+	for i, card := range cards.Cards {
+		image := card.ImageGold
+
+		if battlegrounds {
+			image = card.Battlegrounds.ImageGold
+		}
+		output[i] = getImage(client.heartstoneClient, card.Slug, image, true)
+	}
+
+	return output
+}
+
 // cardCollectionSearch provides parameters for a card collection search
 type cardCollectionSearch struct {
 	// Required Parameters
