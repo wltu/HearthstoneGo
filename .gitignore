@@ -21,3 +21,5 @@ makefile
 main/
 
 .vscode/
+
+*.png

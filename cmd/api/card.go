@@ -48,6 +48,29 @@ type Card struct {
 	Error         CardError     `json:"error"`
 }
 
+// CardImage download card image and return saved location
+func (client *HearthstoneAPI) CardImage(card *Card, battlegrounds bool) string {
+	if battlegrounds {
+		return getImage(client.heartstoneClient,
+			card.Slug,
+			card.Battlegrounds.Image,
+			false)
+	}
+
+	return getImage(client.heartstoneClient, card.Slug, card.Image, false)
+}
+
+// GoldCardImage download golden card image and return saved location
+func (client *HearthstoneAPI) GoldCardImage(card *Card, battlegrounds bool) string {
+	if battlegrounds {
+		return getImage(client.heartstoneClient,
+			card.Slug,
+			card.Battlegrounds.ImageGold,
+			true)
+	}
+	return getImage(client.heartstoneClient, card.Slug, card.ImageGold, true)
+}
+
 type cardSearch struct {
 	// Required Parameters
 	url    string

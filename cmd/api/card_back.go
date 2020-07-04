@@ -20,6 +20,11 @@ type CardBack struct {
 	Slug         string `json:"slug"`
 }
 
+// CardBackImage download card back image and return saved location
+func (client *HearthstoneAPI) CardBackImage(cardBack *CardBack) string {
+	return getImage(client.heartstoneClient, cardBack.Slug, cardBack.Image, false)
+}
+
 func (client *HearthstoneAPI) newCardBackSearch(id string) cardBackSearch {
 	// Required parameters
 	return cardBackSearch{
@@ -49,12 +54,12 @@ func (search *cardBackSearch) execute(client *http.Client, token string) interfa
 }
 
 // SearchCardBack make a API call to search for a card back with the given id
-func (client *HearthstoneAPI) SearchCardBack(id string) CardBack {
+func (client *HearthstoneAPI) SearchCardBack(id string) *CardBack {
 	search := client.newCardBackSearch(id)
 
 	if output, ok := client.execute(&search).(CardBack); ok {
-		return output
+		return &output
 	}
 
-	return CardBack{}
+	return nil
 }
